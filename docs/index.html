@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Flow API Proxy — Documentazione Ufficiale</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --card-border: #30363d;
+      --text-main: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-glow: rgba(88, 166, 255, 0.15);
+      --green: #3fb950;
+      --orange: #d29922;
+      --purple: #bc8cff;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-green { background: rgba(63, 185, 80, 0.15); color: var(--green); border: 1px solid rgba(63, 185, 80, 0.3); }
+    .badge-blue { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(88, 166, 255, 0.3); }
+    .badge-purple { background: rgba(188, 140, 255, 0.15); color: var(--purple); border: 1px solid rgba(188, 140, 255, 0.3); }
+    
+    h1 {
+      font-size: 2.2rem;
+      color: #fff;
+      margin-top: 12px;
+      margin-bottom: 8px;
+    }
+    p.lead {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    .status-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 24px 0 36px 0;
+    }
+    .status-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .status-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .status-card .val {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      word-break: break-all;
+    }
+    section {
+      margin-bottom: 44px;
+    }
+    h2 {
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--accent);
+      padding-left: 12px;
+    }
+    h3 {
+      font-size: 1.15rem;
+      color: #fff;
+      margin: 20px 0 10px 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    pre {
+      background: #090d13;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 14px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #e6edf3;
+      margin: 12px 0;
+    }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(110, 118, 129, 0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #f0883e;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.92rem;
+    }
+    th, td {
+      border: 1px solid var(--card-border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th {
+      background: #1c2128;
+      color: #fff;
+      font-weight: 600;
+    }
+    .method-post {
+      color: #7ee787;
+      font-weight: bold;
+      font-family: var(--font-mono);
+    }
+    .method-get {
+      color: var(--accent);
+      font-weight: bold;
+      font-family: var(--font-mono);
+    }
+    .feature-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .feature-item {
+      background: #11161d;
+      border: 1px solid #282e38;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 0.92rem;
+    }
+    .feature-item strong {
+      color: #fff;
+      display: block;
+      margin-bottom: 4px;
+    }
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding-top: 24px;
+      margin-top: 48px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span class="badge badge-green">● Active Daemon</span>
+        <span class="badge badge-blue">v1.0.0</span>
+        <span class="badge badge-purple">Google Veo & Imagen</span>
+      </div>
+      <h1>Google Flow API Proxy</h1>
+      <p class="lead">Server proxy HTTP ad alte prestazioni con code anti-lock serializzate per Playwright, hosting media locale, streaming byte-range e integrazione opzionale Cloudflare R2.</p>
+    </header>
+
+    <div class="status-bar">
+      <div class="status-card">
+        <div class="label">Local Port</div>
+        <div class="val">1235</div>
+      </div>
+      <div class="status-card">
+        <div class="label">Tailscale IP (Remote)</div>
+        <div class="val">100.74.82.76:1235</div>
+      </div>
+      <div class="status-card">
+        <div class="label">Gestione Demone</div>
+        <div class="val">systemd user service</div>
+      </div>
+      <div class="status-card">
+        <div class="label">Account Google</div>
+        <div class="val">gio4key@gmail.com</div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Caratteristiche Chiave</h2>
+      <ul class="feature-list">
+        <li class="feature-item">
+          <strong>🔒 Protezione Anti-Lock Playwright</strong>
+          Coda FIFO in memoria che gestisce l'accesso seriale al profilo Chrome e pulisce automaticamente i file <code>Singleton*</code> orfani.
+        </li>
+        <li class="feature-item">
+          <strong>📺 Hosting Locale & Byte-Range Streaming</strong>
+          Video e immagini salvati in <code>storage/</code> e serviti su <code>/media/:file</code> con supporto <code>Range: bytes=</code> per scrubbing fluido.
+        </li>
+        <li class="feature-item">
+          <strong>💬 Anteprime Immediate in Chat</strong>
+          Generazione istantanea di markdown cliccabile e Data URI Base64 per visualizzare i media direttamente nella chat di Paseo.
+        </li>
+        <li class="feature-item">
+          <strong>⚡ Modalità Sync & Async</strong>
+          Chiamate sincrone (fino a 180s) oppure asincrone disaccoppiate passando <code>"wait": false</code> con polling su <code>/v1/tasks/:id</code>.
+        </li>
+        <li class="feature-item">
+          <strong>☁️ Cloudflare R2 On-Demand</strong>
+          Passa <code>"upload_r2": true</code> nella richiesta per ottenere anche il link pubblico CDN su bucket <code>video-workflow</code>.
+        </li>
+        <li class="feature-item">
+          <strong>🤖 Compatibilità Drop-In OpenAI</strong>
+          Supporta gli endpoint standard <code>/v1/images/generations</code> e <code>/v1/models</code>.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Controllo del Servizio (Systemd)</h2>
+      <div class="card">
+        <p>Il proxy è installato come demone utente permanente su Linux ThinkPad:</p>
+        <pre><code># Verificare lo stato del servizio
+systemctl --user status gflow-proxy.service
+
+# Leggere i log in tempo reale
+journalctl --user -u gflow-proxy.service -f
+
+# Riavviare il proxy
+systemctl --user restart gflow-proxy.service</code></pre>
+      </div>
+    </section>
+
+    <section>
+      <h2>Specifiche degli Endpoint API</h2>
+
+      <!-- 1. Health -->
+      <div class="card">
+        <h3><span class="method-get">GET</span> /health</h3>
+        <p>Restituisce lo stato del servizio, lo stato delle code e gli indirizzi IP disponibili.</p>
+        <pre><code>curl -s http://localhost:1235/health</code></pre>
+      </div>
+
+      <!-- 2. Video T2V -->
+      <div class="card">
+        <h3><span class="method-post">POST</span> /v1/video/t2v (Text to Video — Veo 3.1)</h3>
+        <table>
+          <thead>
+            <tr><th>Parametro</th><th>Tipo</th><th>Default</th><th>Descrizione</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>prompt</code></td><td>string</td><td><em>obbligatorio</em></td><td>Descrizione cinematografica della scena</td></tr>
+            <tr><td><code>model</code></td><td>string</td><td><code>"omni-flash"</code></td><td>Modello video: <code>omni-flash</code> o <code>veo-2</code></td></tr>
+            <tr><td><code>aspect</code></td><td>string</td><td><code>"9:16"</code></td><td>Formato: <code>9:16</code>, <code>16:9</code>, <code>1:1</code></td></tr>
+            <tr><td><code>wait</code></td><td>boolean</td><td><code>true</code></td><td><code>true</code> attende il completamento; <code>false</code> ritorna <code>202</code> + <code>task_id</code></td></tr>
+            <tr><td><code>upload_r2</code></td><td>boolean</td><td><code>false</code></td><td>Se <code>true</code>, carica anche su Cloudflare R2</td></tr>
+          </tbody>
+        </table>
+        <pre><code>curl -X POST http://localhost:1235/v1/video/t2v \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Cinematic slow motion macro shot of ocean waves at sunrise",
+    "model": "omni-flash",
+    "aspect": "9:16",
+    "wait": true
+  }'</code></pre>
+      </div>
+
+      <!-- 3. Video I2V -->
+      <div class="card">
+        <h3><span class="method-post">POST</span> /v1/video/i2v (Image to Video — Frame Animation)</h3>
+        <table>
+          <thead>
+            <tr><th>Parametro</th><th>Tipo</th><th>Default</th><th>Descrizione</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>prompt</code></td><td>string</td><td><em>obbligatorio</em></td><td>Istruzioni di movimento ed evoluzione della scena</td></tr>
+            <tr><td><code>initial_frame</code></td><td>string</td><td><em>obbligatorio</em></td><td>Path assoluto locale all'immagine iniziale o UUID Flow</td></tr>
+            <tr><td><code>aspect</code></td><td>string</td><td><code>"9:16"</code></td><td>Aspect ratio desiderato</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 4. Image T2I -->
+      <div class="card">
+        <h3><span class="method-post">POST</span> /v1/image/t2i (Text to Image — Nano Banana)</h3>
+        <table>
+          <thead>
+            <tr><th>Parametro</th><th>Tipo</th><th>Default</th><th>Descrizione</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>prompt</code></td><td>string</td><td><em>obbligatorio</em></td><td>Prompt per l'immagine</td></tr>
+            <tr><td><code>model</code></td><td>string</td><td><code>"nano-pro"</code></td><td><code>nano-pro</code>, <code>nano2</code>, <code>image4</code></td></tr>
+            <tr><td><code>aspect</code></td><td>string</td><td><code>"1:1"</code></td><td><code>1:1</code>, <code>9:16</code>, <code>16:9</code>, <code>4:3</code></td></tr>
+            <tr><td><code>count</code></td><td>number</td><td><code>1</code></td><td>Numero di varianti (1-4)</td></tr>
+          </tbody>
+        </table>
+        <pre><code>curl -X POST http://localhost:1235/v1/image/t2i \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A minimalist studio shot of a sleek espresso cup on a dark stone counter",
+    "model": "nano-pro",
+    "aspect": "1:1"
+  }'</code></pre>
+      </div>
+
+      <!-- 5. OpenAI Generations -->
+      <div class="card">
+        <h3><span class="method-post">POST</span> /v1/images/generations (OpenAI Drop-In)</h3>
+        <p>Compatibile direttamente con gli SDK OpenAI ufficiali:</p>
+        <pre><code>curl -X POST http://localhost:1235/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Futuristic neon cyberpunk supercar",
+    "size": "1024x1024"
+  }'</code></pre>
+      </div>
+
+      <!-- 6. Async Polling -->
+      <div class="card">
+        <h3><span class="method-get">GET</span> /v1/tasks/:taskId</h3>
+        <p>Permette il polling asincrono dello stato di avanzamento per task lunghi:</p>
+        <pre><code>curl -s http://localhost:1235/v1/tasks/task_1789223151410_bd7c4787</code></pre>
+      </div>
+    </section>
+
+    <section>
+      <h2>Esempi di Integrazione Client</h2>
+      
+      <div class="card">
+        <h3>Python (`client.py`)</h3>
+        <pre><code>from client import GflowProxyClient
+
+client = GflowProxyClient("http://localhost:1235")
+
+res = client.generate_video_t2v(
+    prompt="Cinematic drone shot of desert dunes",
+    aspect="9:16",
+    wait=True
+)
+
+print("Video URL:", res["remote_url"])
+print("Markdown Preview:", res["markdown_preview"])</code></pre>
+      </div>
+
+      <div class="card">
+        <h3>TypeScript / Bun (`client.ts`)</h3>
+        <pre><code>import { GflowProxyClient } from "./client.ts";
+
+const client = new GflowProxyClient("http://localhost:1235");
+
+const result = await client.generateImageT2I({
+  prompt: "3D character animation keyframe",
+  aspect: "1:1",
+  wait: true
+});
+
+console.log("Local path:", result.local_path);
+console.log("Remote URL:", result.remote_url);</code></pre>
+      </div>
+    </section>
+
+    <footer>
+      Google Flow API Proxy &bull; Gestito su ThinkPad X1 Carbon &bull; Tailscale IP: 100.74.82.76:1235
+    </footer>
+  </div>
+</body>
+</html>

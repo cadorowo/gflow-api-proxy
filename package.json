@@ -1,0 +1,14 @@
+{
+  "name": "gflow-api-proxy",
+  "version": "1.0.0",
+  "description": "Multi-profile HTTP API proxy for Google Flow (Veo & Imagen) with Playwright queue serialization, local media hosting and R2 support",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
