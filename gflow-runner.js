@@ -4,8 +4,8 @@ import { resolve, basename, extname, join } from "node:path";
 import os from "node:os";
 import { uploadToR2 } from "./r2-uploader.js";
 
-const DEFAULT_PROFILE = process.env.GFLOW_DEFAULT_PROFILE || "giovannidegattis";
-const DEFAULT_PROJECT_ID = process.env.GFLOW_DEFAULT_PROJECT_ID || "ef628878-e9bd-47af-82ac-b8584688e948";
+const DEFAULT_PROFILE = process.env.GFLOW_DEFAULT_PROFILE || "default";
+const DEFAULT_PROJECT_ID = process.env.GFLOW_DEFAULT_PROJECT_ID || "";
 const GFLOW_SHARE_DIR = resolve(os.homedir(), ".local/share/gflow-cli");
 
 export function findGflowBinary() {
@@ -13,9 +13,9 @@ export function findGflowBinary() {
   if (envBin && existsSync(envBin)) return envBin;
 
   const candidates = [
-    "/home/ggg/.local/bin/gflow",
-    "/home/ggg/.local/share/uv/tools/gflow-cli/bin/gflow",
     resolve(os.homedir(), ".local/bin/gflow"),
+    resolve(os.homedir(), ".local/share/uv/tools/gflow-cli/bin/gflow"),
+    "/usr/local/bin/gflow",
   ];
 
   for (const bin of candidates) {

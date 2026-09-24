@@ -3,7 +3,7 @@
  */
 
 export interface GflowGenerationOptions {
-  proxyUrl?: string; // default: http://localhost:1235 or http://100.74.82.76:1235
+  proxyUrl?: string; // default: http://localhost:1235
   profile?: string;
   projectId?: string;
   wait?: boolean;

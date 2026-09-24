@@ -24,7 +24,7 @@ if (existsSync(envPath)) {
 
 const PORT = parseInt(process.env.PORT || "1235", 10);
 const STORAGE_DIR = resolve(process.env.STORAGE_DIR || join(process.cwd(), "storage"));
-const DEFAULT_PROFILE = process.env.GFLOW_DEFAULT_PROFILE || "giovannidegattis";
+const DEFAULT_PROFILE = process.env.GFLOW_DEFAULT_PROFILE || "default";
 const GFLOW_API_KEY = process.env.GFLOW_API_KEY || null;
 
 const queue = new QueueManager({ storageDir: STORAGE_DIR });

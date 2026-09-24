@@ -1,7 +1,7 @@
 # 🎬 Google Flow API Proxy — Remote Client & LLM Integration Guide
 
-**Target Audience:** Autonomous Agents, Remote LLMs (Paseo, Hermes, Cursor), Secondary PCs/MacBooks, and Developers.  
-**Server Host:** ThinkPad X1 (`100.74.82.76` on Tailscale Mesh).  
+**Target Audience:** Autonomous Agents, Remote LLMs, Secondary PCs/MacBooks, and Developers.  
+**Server Host:** Remote server or local machine (`<tailscale-ip>` or `127.0.0.1`).  
 **Proxy Port:** `1235`.
 
 ---
@@ -13,7 +13,7 @@ The `gflow-api-proxy` turns local browser automation (`gflow` CLI driving Chrome
 ```
 [ Remote PC / LLM Client ]
            │
-           │ HTTP POST (over Tailscale: 100.74.82.76:1235)
+           │ HTTP POST (over Tailscale / LAN: <remote-ip>:1235)
            ▼
 ┌───────────────────────────────────────────────────────────┐
 │                    gflow-api-proxy                        │
@@ -23,7 +23,7 @@ The `gflow-api-proxy` turns local browser automation (`gflow` CLI driving Chrome
 │                            (Prevents Chrome SingletonLock)│
 │  3. Playwright Runner  ──▶ Headless Chrome (`DISPLAY=:0`) │
 │  4. Local Media Server ──▶ Stores output in `storage/`    │
-│  5. Remote Links       ──▶ Formats direct Tailscale URLs  │
+│  5. Remote Links       ──▶ Formats direct remote URLs     │
 │  6. R2 Uploader (Opt)  ──▶ Syncs to Cloudflare R2 bucket  │
 └───────────────────────────────────────────────────────────┘
            │
@@ -33,12 +33,12 @@ The `gflow-api-proxy` turns local browser automation (`gflow` CLI driving Chrome
 
 ### Key Architectural Strengths:
 1. **Anti-Lock Profile Serialization (`QueueManager`)**:
-   - Google Chrome profiles (`profile_giovannidegattis`) cannot be opened by multiple Playwright instances simultaneously without crashing with `SingletonLock` or `ProfileLockedError`.
+   - Google Chrome profiles (`profile_<name>`) cannot be opened by multiple Playwright instances simultaneously without crashing with `SingletonLock` or `ProfileLockedError`.
    - The proxy maintains a dedicated FIFO queue for each Google profile, automatically clears dead lockfiles, and serializes execution cleanly.
 2. **Local Media Hosting with Zero Buffering**:
    - All generated media is saved in `/storage/` on the server and immediately served via `/media/<filename>` with native HTTP `Range` header support (essential for instant video scrubbing in browsers and chat clients).
 3. **Tailscale Native**:
-   - The proxy auto-detects its Tailscale IP (`100.74.82.76`) and generates direct markdown embeds (`![Preview](http://100.74.82.76:1235/media/...)`) for remote viewing.
+   - The proxy auto-detects its Tailscale IP (`<tailscale-ip>`) and generates direct markdown embeds (`![Preview](http://<remote-ip>:1235/media/...)`) for remote viewing.
 4. **Cloudflare R2 on Demand**:
    - Setting `"upload_r2": true` automatically pushes the file to Cloudflare R2 and provides an additional public CDN link.
 
@@ -48,7 +48,7 @@ The `gflow-api-proxy` turns local browser automation (`gflow` CLI driving Chrome
 
 | Property | Value |
 | :--- | :--- |
-| **Base URL (Remote via Tailscale)** | `http://100.74.82.76:1235` |
+| **Base URL (Remote via Tailscale / LAN)** | `http://<remote-ip>:1235` |
 | **Base URL (Local on Host)** | `http://127.0.0.1:1235` |
 | **Authentication Header** | `Authorization: Bearer <YOUR_GFLOW_API_KEY>` |
 | **API Key Header (Alternative)** | `X-Api-Key: <YOUR_GFLOW_API_KEY>` |
@@ -59,7 +59,7 @@ The `gflow-api-proxy` turns local browser automation (`gflow` CLI driving Chrome
 
 ### 3.1 Health & Status Check
 ```bash
-curl -s http://100.74.82.76:1235/health | jq .
+curl -s http://localhost:1235/health | jq .
 ```
 Returns service state, active tasks, queued tasks, and profile status.
 
@@ -71,7 +71,7 @@ Returns service state, active tasks, queued tasks, and profile status.
 * **Aspect Ratios:** `16:9` (landscape), `9:16` (portrait / reels), `1:1` (square)
 
 ```bash
-curl -X POST http://100.74.82.76:1235/v1/video/t2v \
+curl -X POST http://localhost:1235/v1/video/t2v \
   -H "Authorization: Bearer <YOUR_GFLOW_API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -89,9 +89,9 @@ curl -X POST http://100.74.82.76:1235/v1/video/t2v \
   "status": "completed",
   "media_type": "video",
   "filename": "video_1726157120.mp4",
-  "local_path": "/home/ggg/vibes/gflow-api-proxy/storage/video_1726157120.mp4",
-  "url": "http://100.74.82.76:1235/media/video_1726157120.mp4",
-  "markdown_preview": "![Video](http://100.74.82.76:1235/media/video_1726157120.mp4)"
+  "local_path": "/path/to/gflow-api-proxy/storage/video_1726157120.mp4",
+  "url": "http://<remote-ip>:1235/media/video_1726157120.mp4",
+  "markdown_preview": "![Video](http://<remote-ip>:1235/media/video_1726157120.mp4)"
 }
 ```
 
@@ -102,12 +102,12 @@ curl -X POST http://100.74.82.76:1235/v1/video/t2v \
 * Animate from an initial frame on the host or a remote URL:
 
 ```bash
-curl -X POST http://100.74.82.76:1235/v1/video/i2v \
+curl -X POST http://localhost:1235/v1/video/i2v \
   -H "Authorization: Bearer <YOUR_GFLOW_API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "The camera slowly pans out while the character smiles gently",
-    "initial_frame": "/home/ggg/vibes/gflow-api-proxy/storage/character_keyframe.jpg",
+    "initial_frame": "/path/to/character_keyframe.jpg",
     "aspect": "9:16",
     "wait": true
   }'
@@ -121,7 +121,7 @@ curl -X POST http://100.74.82.76:1235/v1/video/i2v \
 * **Aspect Ratios:** `1:1`, `16:9`, `9:16`, `4:3`, `3:4`
 
 ```bash
-curl -X POST http://100.74.82.76:1235/v1/image/t2i \
+curl -X POST http://localhost:1235/v1/image/t2i \
   -H "Authorization: Bearer <YOUR_GFLOW_API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -138,7 +138,7 @@ curl -X POST http://100.74.82.76:1235/v1/image/t2i \
 Compatible with standard OpenAI client libraries (`openai.images.generate`):
 
 ```bash
-curl -X POST http://100.74.82.76:1235/v1/images/generations \
+curl -X POST http://localhost:1235/v1/images/generations \
   -H "Authorization: Bearer <YOUR_GFLOW_API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -153,7 +153,7 @@ curl -X POST http://100.74.82.76:1235/v1/images/generations \
   "created": 1789229000,
   "data": [
     {
-      "url": "http://100.74.82.76:1235/media/img_1789229000.png"
+      "url": "http://<remote-ip>:1235/media/img_1789229000.png"
     }
   ]
 }
@@ -168,19 +168,19 @@ When generating multiple videos or handling long jobs without blocking the HTTP 
 3. Poll task status:
    ```bash
    curl -s -H "Authorization: Bearer <YOUR_GFLOW_API_KEY>" \
-     http://100.74.82.76:1235/v1/tasks/<task_id>
+     http://<remote-ip>:1235/v1/tasks/<task_id>
    ```
 
 ---
 
-## 4. Code Examples for the Other Computer
+## 4. Code Examples for Remote Clients
 
 ### Python Client (`client.py`)
 ```python
 import os
 import requests
 
-GFLOW_URL = os.getenv("GFLOW_BASE_URL", "http://100.74.82.76:1235")
+GFLOW_URL = os.getenv("GFLOW_BASE_URL", "http://localhost:1235")
 GFLOW_KEY = os.getenv("GFLOW_API_KEY", "<YOUR_GFLOW_API_KEY>")
 
 headers = {
@@ -218,8 +218,8 @@ if __name__ == "__main__":
 
 ### TypeScript / Node.js
 ```typescript
-const GFLOW_URL = "http://100.74.82.76:1235";
-const GFLOW_KEY = "<YOUR_GFLOW_API_KEY>";
+const GFLOW_URL = process.env.GFLOW_BASE_URL || "http://localhost:1235";
+const GFLOW_KEY = process.env.GFLOW_API_KEY || "";
 
 async function createVideo(prompt: string) {
   const response = await fetch(`${GFLOW_URL}/v1/video/t2v`, {
@@ -244,9 +244,9 @@ async function createVideo(prompt: string) {
 
 ---
 
-## 5. Summary of Ports on the ThinkPad Server
+## 5. Port Reference
 
-| Service | Port | Tailscale URL | Purpose |
+| Service | Port | Endpoint | Purpose |
 | :--- | :--- | :--- | :--- |
-| **ACP OpenAI Proxy** | `1234` | `http://100.74.82.76:1234/v1` | LLM inference (Claude 4.6, Gemini 3.8 Flash, GPT OSS 120B) |
-| **Google Flow Proxy** | `1235` | `http://100.74.82.76:1235` | Video (Veo 3.1) & Image (Imagen/Nano) generation |
+| **ACP OpenAI Proxy** | `1234` | `http://<host>:1234/v1` | LLM inference (Claude 4.6, Gemini 3.8 Flash, GPT OSS 120B) |
+| **Google Flow Proxy** | `1235` | `http://<host>:1235` | Video (Veo 3.1) & Image (Imagen/Nano) generation |

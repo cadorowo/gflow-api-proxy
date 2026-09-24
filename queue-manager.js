@@ -32,7 +32,7 @@ export class QueueManager {
     }
 
     if (this.profiles.size === 0) {
-      this.registerProfile("giovannidegattis");
+      this.registerProfile(process.env.GFLOW_DEFAULT_PROFILE || "default");
     }
 
     console.log(`[QueueManager] Registered profile pool:`, Array.from(this.profiles.keys()));
@@ -84,7 +84,7 @@ export class QueueManager {
       }
     }
 
-    return candidate || Array.from(this.profiles.keys())[0] || "giovannidegattis";
+    return candidate || Array.from(this.profiles.keys())[0] || process.env.GFLOW_DEFAULT_PROFILE || "default";
   }
 
   enqueue(taskParams) {

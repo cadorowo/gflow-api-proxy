@@ -8,7 +8,7 @@ Multi-profile HTTP API proxy for **Google Flow** (Veo 3.1 & Imagen / Nano Banana
 
 - **Queue Serialization Anti-Lock**: Automatically coordinates Playwright Chrome instances per Google profile to prevent `ProfileLockedError` and singleton crashes.
 - **Local Media Server**: All generated videos/images are stored locally in `storage/` and served via `/media/:filename` with HTTP Range streaming support.
-- **Tailscale & Remote Ready**: Auto-detects Tailscale IP (`100.74.82.76`) to return direct remote URLs for browsing from your phone or remote laptop.
+- **Tailscale & Remote Ready**: Auto-detects Tailscale IP to return direct remote URLs for browsing from your phone or remote laptop.
 - **Instant Markdown Preview**: Returns `markdown_preview` and Base64 Data URI for immediate visual rendering inside chat UIs (like Paseo).
 - **Cloudflare R2 On-Demand**: Pass `"upload_r2": true` to upload directly to R2 and get a public CDN link.
 - **OpenAI Drop-In Compatible**: Standard `/v1/images/generations` and `/v1/models` endpoints.
@@ -19,7 +19,9 @@ Multi-profile HTTP API proxy for **Google Flow** (Veo 3.1 & Imagen / Nano Banana
 
 ### Start Server
 ```bash
-cd /home/ggg/vibes/gflow-api-proxy
+git clone https://github.com/cadorowo/gflow-api-proxy.git
+cd gflow-api-proxy
+npm install
 npm start
 ```
 By default, listens on port `1235` (e.g. `http://0.0.0.0:1235`).

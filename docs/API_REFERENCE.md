@@ -9,11 +9,11 @@
 - **Daemon**: Managed via user systemd service (`gflow-proxy.service`).
 - **Default Port**: `1235` (binds to `0.0.0.0`).
 - **Local Access**: `http://localhost:1235`
-- **Tailscale Remote Access**: `http://100.74.82.76:1235`
+- **Tailscale Remote Access**: `http://<tailscale-ip>:1235`
 - **Concurrency Manager**: In-memory FIFO queue per Google profile preventing Playwright/Chrome `SingletonLock` errors.
 - **Fail-Fast Policy**: If an auth session expires (HTTP 401), all pending tasks for that profile are aborted immediately with 401 rather than stalling the queue.
-- **Media Storage**: Local storage in `/home/ggg/vibes/gflow-api-proxy/storage/` with HTTP Range streaming support.
-- **R2 Cloud Hosting**: Optional on-demand upload to Cloudflare R2 bucket `video-workflow`.
+- **Media Storage**: Local storage in `./storage/` with HTTP Range streaming support.
+- **R2 Cloud Hosting**: Optional on-demand upload to Cloudflare R2 bucket.
 
 ---
 
@@ -48,11 +48,11 @@ Returns system health, active/queued jobs per Google profile, Tailscale IPs, and
   "status": "ok",
   "service": "gflow-api-proxy",
   "version": "1.0.0",
-  "gflow_bin": "/home/ggg/.local/bin/gflow",
-  "default_profile": "giovannidegattis",
+  "gflow_bin": "/usr/local/bin/gflow",
+  "default_profile": "default",
   "profiles": [
     {
-      "profile": "giovannidegattis",
+      "profile": "default",
       "running": false,
       "queued": 0,
       "state": "healthy",
@@ -62,10 +62,10 @@ Returns system health, active/queued jobs per Google profile, Tailscale IPs, and
   "network": {
     "port": 1235,
     "local_host": "http://localhost:1235",
-    "remote_host": "http://100.74.82.76:1235",
-    "tailscale_ip": "100.74.82.76"
+    "remote_host": "http://<remote-ip>:1235",
+    "tailscale_ip": "<remote-ip>"
   },
-  "storage_dir": "/home/ggg/vibes/gflow-api-proxy/storage"
+  "storage_dir": "/path/to/gflow-api-proxy/storage"
 }
 ```
 
@@ -104,7 +104,7 @@ Generates high-definition video using Veo 3.1.
 | `model` | string | No | `"omni-flash"` | `"omni-flash"` or `"veo-2"` |
 | `aspect` | string | No | `"9:16"` | `"9:16"`, `"16:9"`, `"1:1"` |
 | `project_id` | string | No | configured default | Target Google Flow project UUID |
-| `profile` | string | No | `"giovannidegattis"` | Account profile to use |
+| `profile` | string | No | `"default"` | Account profile to use |
 | `wait` | boolean | No | `true` | `true` = wait for file; `false` = return `202 Accepted` + `task_id` |
 | `upload_r2` | boolean | No | `false` | Upload result to Cloudflare R2 |
 
@@ -127,12 +127,12 @@ curl -X POST http://localhost:1235/v1/video/t2v \
   "success": true,
   "task_id": "task_1789223400_a1b2c3d4",
   "filename": "gflow_video_1789223400.mp4",
-  "local_path": "/home/ggg/vibes/gflow-api-proxy/storage/gflow_video_1789223400.mp4",
+  "local_path": "/path/to/gflow-api-proxy/storage/gflow_video_1789223400.mp4",
   "media_url": "http://localhost:1235/media/gflow_video_1789223400.mp4",
-  "remote_url": "http://100.74.82.76:1235/media/gflow_video_1789223400.mp4",
-  "r2_url": "https://pub-1eccb9d654364b5d9e7545e3ebad5469.r2.dev/twist-it/gflow_video_1789223400.mp4",
+  "remote_url": "http://<remote-ip>:1235/media/gflow_video_1789223400.mp4",
+  "r2_url": "https://pub-xxxxxx.r2.dev/gflow_video_1789223400.mp4",
   "data_uri": null,
-  "markdown_preview": "<video src=\"http://100.74.82.76:1235/media/gflow_video_1789223400.mp4\" controls width=\"100%\"></video>"
+  "markdown_preview": "<video src=\"http://<remote-ip>:1235/media/gflow_video_1789223400.mp4\" controls width=\"100%\"></video>"
 }
 ```
 
@@ -176,12 +176,12 @@ Generates 1 to 4 images using Nano Banana Pro / Imagen models.
   "success": true,
   "task_id": "task_1789223151410_bd7c4787",
   "filename": "gflow_image_1789223151412.jpg",
-  "local_path": "/home/ggg/vibes/gflow-api-proxy/storage/gflow_image_1789223151412.jpg",
+  "local_path": "/path/to/gflow-api-proxy/storage/gflow_image_1789223151412.jpg",
   "media_url": "http://localhost:1235/media/gflow_image_1789223151412.jpg",
-  "remote_url": "http://100.74.82.76:1235/media/gflow_image_1789223151412.jpg",
+  "remote_url": "http://<remote-ip>:1235/media/gflow_image_1789223151412.jpg",
   "r2_url": null,
   "data_uri": "data:image/jpeg;base64,...",
-  "markdown_preview": "![gflow_image_1789223151412.jpg](http://100.74.82.76:1235/media/gflow_image_1789223151412.jpg)"
+  "markdown_preview": "![gflow_image_1789223151412.jpg](http://<remote-ip>:1235/media/gflow_image_1789223151412.jpg)"
 }
 ```
 
@@ -222,7 +222,7 @@ Compatible with standard OpenAI client libraries (`openai.images.generate(...)`)
   "created": 1741792800,
   "data": [
     {
-      "url": "http://100.74.82.76:1235/media/gflow_image_12345.jpg",
+      "url": "http://<remote-ip>:1235/media/gflow_image_12345.jpg",
       "b64_json": "<base64 string>"
     }
   ]
@@ -240,8 +240,8 @@ When any endpoint is called with `"wait": false`, the proxy returns `202 Accepte
 {
   "task_id": "task_1789223151410_bd7c4787",
   "status": "pending",
-  "profile": "giovannidegattis",
-  "poll_url": "http://100.74.82.76:1235/v1/tasks/task_1789223151410_bd7c4787"
+  "profile": "default",
+  "poll_url": "http://<remote-ip>:1235/v1/tasks/task_1789223151410_bd7c4787"
 }
 ```
 
